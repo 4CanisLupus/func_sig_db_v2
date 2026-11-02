@@ -1,0 +1,22 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug func_sig_db",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/func_sig_db.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/build",
+            "environment": [
+                { "name": "PATH", "value": "C:\msys64\mingw64\bin;${env:PATH}" },
+                { "name": "PGPASSWORD", "value": "admin" }
+            ],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "miDebuggerPath": "C:\msys64\mingw64\bin\gdb.exe",
+            "preLaunchTask": "Build"
+        }
+    ]
+}
