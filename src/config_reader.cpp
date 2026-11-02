@@ -124,6 +124,10 @@ AppConfig readConfig(const std::string& filePath) {
                 cfg.dbname = value;
             } else if (key == "user") {
                 cfg.user = value;
+            } else if (key == "host") {
+                cfg.host = value;
+            } else if (key == "port") {
+                cfg.port = value;
             } else if (key == "tbl_name") {
                 cfg.tbl_name = value;
             } else if (key == "cycle_time") {

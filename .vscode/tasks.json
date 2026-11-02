@@ -7,7 +7,7 @@
             "command": "cmake -S . -B build -G \"MinGW Makefiles\" -DCMAKE_BUILD_TYPE=Debug; cmake --build build",
             "options": {
                 "cwd": "${workspaceFolder}",
-                "env": { "PATH": "C:\msys64\mingw64\bin;${env:PATH}" }
+                "env": { "PATH": "C:/msys64/mingw64/bin;${env:PATH}" }
             },
             "group": { "kind": "build", "isDefault": true },
             "problemMatcher": ["$gcc"]

@@ -7,6 +7,8 @@
 struct AppConfig {
     std::string dbname;
     std::string user;
+    std::string host; // необязательно, по умолчанию localhost
+    std::string port; // необязательно, порт PostgreSQL (по умолчанию 5432)
     std::string tbl_name;
     int cycle_time;   // миллисекунды, интервал между вызовами
     std::string func_mode;

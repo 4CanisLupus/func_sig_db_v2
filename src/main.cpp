@@ -36,6 +36,8 @@ int main() {
 
     const char* pwd = std::getenv("PGPASSWORD");
     std::string conninfo = "dbname=" + cfg.dbname +
+                           (cfg.host.empty() ? "" : " host=" + cfg.host) +
+                           (cfg.port.empty() ? "" : " port=" + cfg.port) +
                            " user=" + cfg.user +
                            " password=" + std::string(pwd ? pwd : "");
     try {

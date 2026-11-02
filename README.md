@@ -8,9 +8,12 @@
 func_sig_db_v2/
 ├── CMakeLists.txt
 ├── README.md
-├── func_sig_db_v2.cfg              # конфигурационный файл (в месте запуска)
+├── build.bat                       # сборка под Windows (MinGW)
+├── run.bat                         # запуск из папки build
+├── func_sig_db_v2.cfg              # конфигурационный файл (копируется в build\ при сборке)
 ├── config/
 │   └── func_sig_db_v2.cfg          # резервная копия конфига
+├── .vscode/                        # tasks.json, launch.json, c_cpp_properties.json (MinGW/gdb)
 ├── include/
 │   ├── config_reader.hpp           # структура AppConfig + readConfig()
 │   ├── db_connector.hpp            # класс DBConnector (подключение к БД)
@@ -24,13 +27,15 @@ func_sig_db_v2/
 
 ## Конфигурация
 
-Программа читает настройки из JSON-файла `./func_sig_db_v2.cfg` (рядом с исполняемым файлом).
+Программа читает настройки из JSON-файла `./func_sig_db_v2.cfg` (из текущей директории; при запуске через `run.bat` или отладку VS Code — это `build\`).
 
 | Поле | Тип | Назначение |
 |---|---|---|
 | `dbname` | string | Имя базы данных |
 | `user` | string | Пользователь БД |
-| `tbl_name` | string | Имя целевой таблицы с схемой (`simul.tbl_cfa_simul_sig_0`) |
+| `host` | string | Хост БД (необязательно, по умолчанию `localhost`) |
+| `port` | string | Порт БД (необязательно, по умолчанию `5432`; для текущего сервера — `5433`) |
+| `tbl_name` | string | Имя целевой таблицы со схемой (`simul.tbl_cfa_simul_sig_0`) |
 | `cycle_time` | string (int) | Интервал между циклами записи, **мс** |
 | `func_mode` | string | Режим генерации: `"random"` или `"sine"` |
 | `SinePeriodMS` | string (int) | Период полного оборота синусоиды, **мс** (только для `sine`) |
@@ -40,6 +45,8 @@ func_sig_db_v2/
 {
     "dbname": "purneft_P174",
     "user": "postgres",
+    "host": "localhost",
+    "port": "5433",
     "tbl_name": "simul.tbl_cfa_simul_sig_0",
     "cycle_time": "1000",
     "func_mode": "sine",
@@ -108,6 +115,14 @@ run.bat
 
 Конфиг `func_sig_db_v2.cfg` копируется в `build\` при сборке; программа читает его из текущей директории (`run.bat` запускает из `build`).
 Остановка — **Ctrl+C**.
+
+### Отладка в VS Code
+Нужны расширение C/C++ и gdb (`pacman -S mingw-w64-x86_64-gdb`). Конфигурация **Debug func_sig_db** собирает проект задачей `Build` и запускает `build/func_sig_db.exe`. Пароль задаётся в `.vscode/launch.json` (`PGPASSWORD`) — не коммитьте его.
+
+### Типичные проблемы
+- **`no password supplied` / `password authentication failed`** — не задан или неверен `PGPASSWORD`; проверьте вход: `psql -U postgres -h localhost -p 5433 -d purneft_P174`.
+- **Подключение не к тому серверу** — на машине может быть несколько экземпляров PostgreSQL; фактический порт узнайте запросом `SHOW port;` и укажите его в `port`.
+- **Нечитаемый текст ошибки подключения** — сервер присылает сообщение об аутентификации в кодировке Windows-1251; смысл см. по контексту (`password authentication failed`).
 
 ## Переменные окружения
 
