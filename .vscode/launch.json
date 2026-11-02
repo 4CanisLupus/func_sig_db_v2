@@ -11,7 +11,7 @@
             "cwd": "${workspaceFolder}/build",
             "environment": [
                 { "name": "PATH", "value": "C:/msys64/mingw64/bin;${env:PATH}" },
-                { "name": "PGPASSWORD", "value": "admin" }
+                { "name": "PGPASSWORD", "value": "*****" }
             ],
             "externalConsole": false,
             "MIMode": "gdb",
