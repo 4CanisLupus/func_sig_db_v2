@@ -2,4 +2,5 @@ build/
 .vscode/launch.json
 .vscode/tasks.json
 .vscode/launch.json
-
+*.cfg
+func_sig_db_v2.cfg
