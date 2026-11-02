@@ -69,8 +69,12 @@ int main() {
               writer.populateRandomValues(db);
             } else if (cfg.func_mode == "sine") {
               writer.populateSineValues(db, cfg.cycle_time, cfg.SinePeriodMS);
+            } else if (cfg.func_mode == "start") {
+              writer.populateRampValues(db, true);
+            } else if (cfg.func_mode == "stop") {
+              writer.populateRampValues(db, false);
             }
-  
+
             std::this_thread::sleep_for(std::chrono::milliseconds(cfg.cycle_time));
         }
 

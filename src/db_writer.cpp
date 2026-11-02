@@ -128,3 +128,63 @@ void DBWriter::populateSineValues(DBConnector& db, int cycleTimeMs, int sinePeri
     std::cout << "Колонка Value обновлена по синусоиде (фаза="
               << m_sinePhase << " рад).\n";
 }
+
+void DBWriter::populateRampValues(DBConnector& db, bool start) {
+    if (!m_rampStarted) {
+        m_rampStarted = true;
+        m_rampT0 = std::chrono::steady_clock::now();
+    }
+    double elapsedMs = std::chrono::duration<double, std::milli>(
+        std::chrono::steady_clock::now() - m_rampT0).count();
+
+    const char* timeCol = start ? "start_time" : "stop_time";
+    std::string selectQuery = std::string("SELECT id, sensor_alg, sim_min, sim_max, ") + timeCol +
+                              ", sensor_cndtn FROM " + m_tableName + ";";
+    auto rows = db.executeQuery(selectQuery);
+
+    if (rows.empty()) {
+        std::cout << "Таблица " << m_tableName << " пуста – нечего заполнять.\n";
+        return;
+    }
+
+    for (const auto& row : rows) {
+        const std::string& id = row[0];
+        std::string alg = row[1];
+        int sensorCndtn = std::atoi(row[5].c_str());
+
+        // Меняем Value только при sensor_cndtn = 1
+        if (sensorCndtn != 1) {
+            continue;
+        }
+
+        std::transform(alg.begin(), alg.end(), alg.begin(), ::tolower);
+        if (alg != "line") {
+            continue;
+        }
+
+        double vMin, vMax, timeMs;
+        try {
+            vMin = std::stod(row[2]);
+            vMax = std::stod(row[3]);
+            timeMs = std::stod(row[4]);
+        } catch (const std::exception&) {
+            std::cout << "Пропущена строка id=" << id
+                      << " (некорректные sim_min/sim_max/" << timeCol << ")\n";
+            continue;
+        }
+
+        // Доля пройденного пути [0, 1]; при нулевом времени сразу конечное значение
+        double frac = (timeMs > 0.0) ? std::min(elapsedMs / timeMs, 1.0) : 1.0;
+        double from = start ? vMin : vMax;
+        double to   = start ? vMax : vMin;
+        double newValue = from + (to - from) * frac;
+
+        std::string updateQuery =
+            "UPDATE " + m_tableName + " SET \"Value\" = " +
+            std::to_string(newValue) + " WHERE id = " + id + ";";
+        db.executeCommand(updateQuery);
+    }
+
+    std::cout << "Колонка Value обновлена в режиме '" << (start ? "start" : "stop")
+              << "' (t=" << elapsedMs << " мс).\n";
+}

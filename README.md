@@ -38,7 +38,7 @@ func_sig_db_v2/
 | `port` | string | Порт БД (необязательно, по умолчанию `5432`; для текущего сервера — `5433`) |
 | `tbl_name` | string | Имя целевой таблицы со схемой (`simul.tbl_cfa_simul_sig_0`) |
 | `cycle_time` | string (int) | Интервал между циклами записи, **мс** |
-| `func_mode` | string | Режим генерации: `"random"` или `"sine"` |
+| `func_mode` | string | Режим генерации: `"random"`, `"sine"`, `"start"` или `"stop"` |
 | `SinePeriodMS` | string (int) | Период полного оборота синусоиды, **мс** (только для `sine`) |
 
 Пример:
@@ -70,6 +70,14 @@ func_sig_db_v2/
 `Value = simul × (1.0 + 0.1 × sin(phase))`
 
 Фаза наращивается с каждым циклом пропорционально `cycle_time`, полный период задаётся полем `SinePeriodMS`.
+
+### `start` / `stop` — линейный пуск и останов
+Работают для строк с `sensor_alg = 'line'` и `sensor_cndtn = 1`; остальные строки не изменяются.
+Время отсчитывается от запуска программы, после его окончания `Value` удерживается на конечном значении.
+- `start`: `Value` линейно растёт от `sim_min` до `sim_max` за `start_time` мс.
+- `stop`: `Value` линейно падает от `sim_max` до `sim_min` за `stop_time` мс.
+
+Нужные столбцы: `sensor_alg`, `sim_min`, `sim_max`, `start_time`, `stop_time`.
 
 ## Управление записью через `sensor_cndtn`
 

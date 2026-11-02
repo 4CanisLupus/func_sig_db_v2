@@ -4,6 +4,7 @@
 #include "db_connector.hpp"
 #include <string>
 #include <cmath>
+#include <chrono>
 
 class DBWriter {
 public:
@@ -20,8 +21,16 @@ public:
     // sinePeriodMs — период полного оборота синусоиды в мс (из конфига)
     void populateSineValues(DBConnector& db, int cycleTimeMs, int sinePeriodMs);
 
+    // Режимы "start"/"stop": линейное изменение Value для строк с sensor_alg = 'line'
+    // start: sim_min -> sim_max за start_time мс; stop: sim_max -> sim_min за stop_time мс
+    // Время отсчитывается от первого вызова; после окончания значение удерживается на конце.
+    // Меняются только строки с sensor_cndtn = 1.
+    void populateRampValues(DBConnector& db, bool start);
+
 private:
     std::string m_tableName;
+    bool m_rampStarted = false;
+    std::chrono::steady_clock::time_point m_rampT0;
     double m_sinePhase = 0.0; // фаза синусоиды, накапливается с каждым вызовом
 };
 
