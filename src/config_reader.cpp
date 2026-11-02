@@ -124,6 +124,8 @@ AppConfig readConfig(const std::string& filePath) {
                 cfg.dbname = value;
             } else if (key == "user") {
                 cfg.user = value;
+            } else if (key == "password") {
+                cfg.password = value;
             } else if (key == "host") {
                 cfg.host = value;
             } else if (key == "port") {

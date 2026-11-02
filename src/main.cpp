@@ -45,12 +45,17 @@ int main() {
     AppConfig cfg = readConfig(configPath);
     std::cout << "Конфигурация загружена из " << configPath << "\n";
 
-    const char* pwd = std::getenv("PGPASSWORD");
+    // Пароль из конфига; если не задан — из переменной окружения PGPASSWORD
+    std::string password = cfg.password;
+    if (password.empty()) {
+        const char* pwd = std::getenv("PGPASSWORD");
+        if (pwd) password = pwd;
+    }
     std::string conninfo = "dbname=" + quoteConnValue(cfg.dbname) +
                            (cfg.host.empty() ? "" : " host=" + quoteConnValue(cfg.host)) +
                            (cfg.port.empty() ? "" : " port=" + quoteConnValue(cfg.port)) +
                            " user=" + quoteConnValue(cfg.user) +
-                           " password=" + quoteConnValue(pwd ? pwd : "");
+                           " password=" + quoteConnValue(password);
     try {
         DBConnector db(conninfo);
         DBWriter writer(cfg.tbl_name);

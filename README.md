@@ -33,6 +33,7 @@ func_sig_db_v2/
 |---|---|---|
 | `dbname` | string | Имя базы данных |
 | `user` | string | Пользователь БД |
+| `password` | string | Пароль пользователя БД (необязательно; если пусто — берётся из переменной окружения `PGPASSWORD`) |
 | `host` | string | Хост БД (необязательно, по умолчанию `localhost`) |
 | `port` | string | Порт БД (необязательно, по умолчанию `5432`; для текущего сервера — `5433`) |
 | `tbl_name` | string | Имя целевой таблицы со схемой (`simul.tbl_cfa_simul_sig_0`) |
@@ -45,6 +46,7 @@ func_sig_db_v2/
 {
     "dbname": "purneft_P174",
     "user": "postgres",
+    "password": "ваш_пароль",
     "host": "localhost",
     "port": "5433",
     "tbl_name": "simul.tbl_cfa_simul_sig_0",
@@ -53,6 +55,8 @@ func_sig_db_v2/
     "SinePeriodMS": "60000"
 }
 ```
+
+> Файлы `*.cfg` добавлены в `.gitignore` и не попадают в репозиторий, так как содержат пароль. После клонирования создайте `func_sig_db_v2.cfg` вручную по примеру выше.
 
 ## Режимы работы (`func_mode`)
 
@@ -109,18 +113,19 @@ CREATE TABLE simul.tbl_cfa_simul_sig_0 (
 
 ```bat
 build.bat
-set PGPASSWORD=ваш_пароль
 run.bat
 ```
+
+Пароль задаётся в `func_sig_db_v2.cfg` (поле `password`); при необходимости его можно передать через `set PGPASSWORD=ваш_пароль` перед `run.bat`.
 
 Конфиг `func_sig_db_v2.cfg` копируется в `build\` при сборке; программа читает его из текущей директории (`run.bat` запускает из `build`).
 Остановка — **Ctrl+C**.
 
 ### Отладка в VS Code
-Нужны расширение C/C++ и gdb (`pacman -S mingw-w64-x86_64-gdb`). Конфигурация **Debug func_sig_db** собирает проект задачей `Build` и запускает `build/func_sig_db.exe`. Пароль задаётся в `.vscode/launch.json` (`PGPASSWORD`) — не коммитьте его.
+Нужны расширение C/C++ и gdb (`pacman -S mingw-w64-x86_64-gdb`). Конфигурация **Debug func_sig_db** собирает проект задачей `Build` и запускает `build/func_sig_db.exe`. Пароль берётся из `func_sig_db_v2.cfg` (при пустом `password` — из `PGPASSWORD` в `.vscode/launch.json`, этот файл в `.gitignore`).
 
 ### Типичные проблемы
-- **`no password supplied` / `password authentication failed`** — не задан или неверен `PGPASSWORD`; проверьте вход: `psql -U postgres -h localhost -p 5433 -d purneft_P174`.
+- **`no password supplied` / `password authentication failed`** — не задан или неверен `password` в конфиге (или `PGPASSWORD`); проверьте вход: `psql -U postgres -h localhost -p 5433 -d purneft_P174`.
 - **Подключение не к тому серверу** — на машине может быть несколько экземпляров PostgreSQL; фактический порт узнайте запросом `SHOW port;` и укажите его в `port`.
 - **Нечитаемый текст ошибки подключения** — сервер присылает сообщение об аутентификации в кодировке Windows-1251; смысл см. по контексту (`password authentication failed`).
 
@@ -128,4 +133,4 @@ run.bat
 
 | Переменная | Назначение |
 |---|---|
-| `PGPASSWORD` | Пароль пользователя БД |
+| `PGPASSWORD` | Пароль пользователя БД (используется, если `password` в конфиге пуст) |

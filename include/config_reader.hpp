@@ -7,6 +7,7 @@
 struct AppConfig {
     std::string dbname;
     std::string user;
+    std::string password; // необязательно; если пусто — берётся из PGPASSWORD
     std::string host; // необязательно, по умолчанию localhost
     std::string port; // необязательно, порт PostgreSQL (по умолчанию 5432)
     std::string tbl_name;
