@@ -18,6 +18,17 @@ void signalHandler(int /*signum*/) {
     g_running = 0;
 }
 
+// Значение для строки подключения libpq: в одинарных кавычках, ' и обратный слэш экранируются
+// (иначе пароль с пробелом ломает разбор строки)
+static std::string quoteConnValue(const std::string& v) {
+    std::string r = "'";
+    for (char c : v) {
+        if (c == '\'' || c == '\\') r += '\\';
+        r += c;
+    }
+    return r + "'";
+}
+
 int main() {
 #ifdef _WIN32
     // Вывод в консоль Windows в UTF-8 (иначе кириллица отображается некорректно)
@@ -35,11 +46,11 @@ int main() {
     std::cout << "Конфигурация загружена из " << configPath << "\n";
 
     const char* pwd = std::getenv("PGPASSWORD");
-    std::string conninfo = "dbname=" + cfg.dbname +
-                           (cfg.host.empty() ? "" : " host=" + cfg.host) +
-                           (cfg.port.empty() ? "" : " port=" + cfg.port) +
-                           " user=" + cfg.user +
-                           " password=" + std::string(pwd ? pwd : "");
+    std::string conninfo = "dbname=" + quoteConnValue(cfg.dbname) +
+                           (cfg.host.empty() ? "" : " host=" + quoteConnValue(cfg.host)) +
+                           (cfg.port.empty() ? "" : " port=" + quoteConnValue(cfg.port)) +
+                           " user=" + quoteConnValue(cfg.user) +
+                           " password=" + quoteConnValue(pwd ? pwd : "");
     try {
         DBConnector db(conninfo);
         DBWriter writer(cfg.tbl_name);
