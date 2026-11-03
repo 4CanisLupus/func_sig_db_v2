@@ -89,7 +89,7 @@ AppConfig readConfig(const std::string& filePath) {
     ++pos; // переходим внутрь объекта
 
     AppConfig cfg;
-    cfg.cycle_time = 1000;    // значение по умолчанию
+    cfg.cycle_time = 500;    // значение по умолчанию
     cfg.SinePeriodMS = 60000; // значение по умолчанию (60 сек)
 
     while (pos < content.size()) {
@@ -135,7 +135,7 @@ AppConfig readConfig(const std::string& filePath) {
             } else if (key == "cycle_time") {
                 cfg.cycle_time = std::atoi(value.c_str());
                 if (cfg.cycle_time <= 0) {
-                    cfg.cycle_time = 1000;
+                    cfg.cycle_time = 500;
                 }
             } else if (key == "func_mode") {
                 cfg.func_mode = value;
