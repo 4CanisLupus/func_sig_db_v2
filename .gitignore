@@ -4,3 +4,4 @@ build/
 .vscode/launch.json
 *.cfg
 func_sig_db_v2.cfg
+func_sig_db_v2.cfg
